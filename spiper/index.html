@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Sonic Pi Preview</title>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<link rel="stylesheet" href="style.css"/>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+</head>
+
+<body>
+<h2>Welcome to Sonic Pi Preview.</h2>
+Click play to hear the first 30 seconds of the Sonic Pi program shown below.
+<p>
+<audio controls="controls">
+<source type="audio/wav" preload="metadata"/>
+Your browser does not support the <code>audio</code> element.
+</audio>
+
+<pre>
+<code id="code" class="ruby"># Loading code...</code>
+</pre>
+
+<pre id="err">
+</pre>
+
+<script>
+function getQueryArgs() {
+  var
+    s = window.location.search,
+    args = s.slice(1).split("#"),
+    q = {};
+  args.forEach(function (s) {
+    var
+      pair = s.split("=", 2),
+      key = pair[0],
+      val = pair[1] || "";
+    (q[key] = q[key] || []).push(val);
+  });
+  return q;
+}
+
+function transformURL(url) {
+  var
+    ghPrefix = "https://github.com/",
+    gistPrefix = "https://gist.github.com/";
+  if (url.startsWith(ghPrefix)) {
+    url = url.replace(ghPrefix, "https://raw.githubusercontent.com/");
+    url = url.replace("/blob/", "/");
+  } else if (url.startsWith(gistPrefix)) {
+    url = url.replace(gistPrefix, "https://gist.githubusercontent.com/");
+    if (!url.endsWith("/")) {
+      url += "/";
+    }
+    url += "raw";
+  }
+  return url;
+}
+
+function showErr(e) {
+  var msg = e.message || String(e);
+  d3.select("#err").text("ERROR: " + msg);
+}
+
+var
+  q = getQueryArgs(),
+  urls = q["url"],
+  url = urls && urls[0];
+console.log("query args: " + JSON.stringify(q));
+console.log("url: " + url);
+
+if (!url) {
+  showErr("Missing url query arg");
+} else {
+  var transformedURL = transformURL(url);
+  console.log("transformed url: " + transformedURL);
+
+  d3.text(transformedURL).then(function(text) {
+    // console.log(text);
+    var sel = d3.select("#code").html(text);
+    console.log(sel.node());
+    hljs.highlightBlock(sel.node());
+  }).catch(function(e) {
+    showErr(e);
+  });
+}
+
+hljs.initHighlightingOnLoad();
+
+// deferred loading of audio
+d3.select("audio")
+  .attr("src", "./recording-2018-02-19T22_02_22-05_00.wav");
+
+</script>
+
+</body>
+</html>

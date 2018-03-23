@@ -1,0 +1,19 @@
+body {
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+}
+
+pre {
+  border-left: solid 2px #ccc;
+  padding-left: 5px;
+  max-width: 960;
+  overflow-x: auto;
+}
+
+code {
+  font-family: Menlo;
+  font-size: 10pt;
+}
+
+.hljs {
+  background: #fffff0;
+}
